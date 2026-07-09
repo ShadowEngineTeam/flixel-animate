@@ -31,6 +31,9 @@ import openfl.display.Graphics;
 import openfl.display.OpenGLRenderer;
 import openfl.display.Shader;
 import openfl.display._internal.Context3DGraphics;
+#if (lime && !js)
+import lime.graphics.bgfx.BGFX;
+#end
 #else
 import animate.internal.elements.AtlasInstance.BakedInstance;
 import flixel.util.FlxColor;
@@ -154,11 +157,16 @@ class FilterRenderer
 
 		renderer.__worldTransform.identity();
 
-		var gl = renderer.__gl;
 		var renderBuffer = bmp.getTexture(context);
 
+		#if (lime && !js)
+		BGFX.readTexture(renderBuffer.__bgfxTexture, bmp.image.data);
+		BGFX.frame();
+		#else
+		var gl = renderer.__gl;
 		@:privateAccess
 		gl.readPixels(0, 0, bmp.width, bmp.height, renderBuffer.__format, gl.UNSIGNED_BYTE, bmp.image.data);
+		#end
 		bmp.image.version = 0;
 		bmp.__textureVersion = -1;
 
@@ -372,11 +380,16 @@ class FilterRenderer
 		}
 		#end
 
-		var gl = renderer.__gl;
 		var renderBuffer = bitmap.getTexture(renderer.__context3D);
 
+		#if (lime && !js)
+		BGFX.readTexture(renderBuffer.__bgfxTexture, bitmap.image.data);
+		BGFX.frame();
+		#else
+		var gl = renderer.__gl;
 		@:privateAccess
 		gl.readPixels(0, 0, bitmap.width, bitmap.height, renderBuffer.__format, gl.UNSIGNED_BYTE, bitmap.image.data);
+		#end
 		bitmap.image.version = 0;
 		bitmap.__textureVersion = -1;
 
@@ -457,10 +470,15 @@ class FilterRenderer
 		target.__renderTransform.identity();
 		renderer.__renderFilterPass(bitmap, shader, true);
 
-		var gl = renderer.__gl;
 		var renderBuffer = target.getTexture(renderer.__context3D);
 
+		#if (lime && !js)
+		BGFX.readTexture(renderBuffer.__bgfxTexture, target.image.data);
+		BGFX.frame();
+		#else
+		var gl = renderer.__gl;
 		gl.readPixels(0, 0, target.width, target.height, renderBuffer.__format, gl.UNSIGNED_BYTE, target.image.data);
+		#end
 		target.image.version = 0;
 		target.__textureVersion = -1;
 	}
