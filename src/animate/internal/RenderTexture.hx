@@ -47,15 +47,19 @@ class RenderTexture implements IFlxDestroyable
 
 	public function destroy():Void
 	{
-		_renderer.__cleanup();
-		_renderer = null;
-
-		for (bitmap in _bitmaps.iterator())
+		if (_renderer != null)
 		{
-			if (bitmap.__texture != null)
-				bitmap.__texture.dispose();
-			bitmap.dispose();
+			_renderer.__cleanup();
+			_renderer = null;
 		}
+
+		if (_bitmaps != null)
+			for (bitmap in _bitmaps.iterator())
+			{
+				if (bitmap.__texture != null)
+					bitmap.__texture.dispose();
+				bitmap.dispose();
+			}
 
 		_bitmaps = null;
 		_currentBitmap = null;

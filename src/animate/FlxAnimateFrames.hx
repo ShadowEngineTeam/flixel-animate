@@ -260,6 +260,15 @@ class FlxAnimateFrames extends FlxAtlasFrames
 				}
 			}
 
+			// I noticed sometimes the timeline layers or bounds get nullified
+			// This check didn't help but i believe it's good to have it still here for safety
+			// -Karim
+			@:privateAccess
+			if (!isAtlasDestroyed && (cachedAtlas.timeline.layers == null || cachedAtlas.timeline.layers.length <= 0 || cachedAtlas.timeline._bounds == null))
+			{
+				isAtlasDestroyed = true;
+			}
+
 			// Destroy previously cached atlas if incomplete, and create a new instance
 			if (isAtlasDestroyed)
 			{
@@ -279,9 +288,12 @@ class FlxAnimateFrames extends FlxAtlasFrames
 		return _fromAnimateInput(animate, spritemaps, metadata, key, settings);
 	}
 
-	static function getTextFromPath(path:String):String
+	static function getTextFromPath(path:String):Null<String>
 	{
-		return FlxAnimateAssets.getText(path).replace(String.fromCharCode(0xFEFF), "");
+		// getText() returns null if the asset could not be fetched.
+		var text:Null<String> = FlxAnimateAssets.getText(path);
+		if (text == null) return null;
+		return text.replace(String.fromCharCode(0xFEFF), "");
 	}
 
 	static function listWithFilter(path:String, filter:String->Bool, includeSubDirectories:Bool = false)
@@ -290,12 +302,14 @@ class FlxAnimateFrames extends FlxAtlasFrames
 		return list.filter(filter);
 	}
 
-	static function getGraphic(path:String):FlxGraphic
+	static function getGraphic(path:String, ?key:String):FlxGraphic
 	{
-		if (FlxG.bitmap.checkCache(path))
-			return FlxG.bitmap.get(path);
+		if (key == null) key = path;
 
-		return FlxG.bitmap.add(FlxAnimateAssets.getBitmapData(path), false, path);
+		if (FlxG.bitmap.checkCache(key))
+			return FlxG.bitmap.get(key);
+
+		return FlxG.bitmap.add(FlxAnimateAssets.getBitmapData(path), false, key);
 	}
 
 	var _symbolDictionary:Null< #if flash Array<SymbolJson> #else Vector<SymbolJson> #end>;
@@ -481,7 +495,7 @@ class FlxAnimateFrames extends FlxAtlasFrames
 	 * Combines two ``FlxAtlasFrames`` into one.
 	 * Recommended to use over manually calling ``frames.addAtlas`` when working with
 	 * ``FlxAnimateFrames`` and other mixed frame types, due to some special merge order conditions it requires.
-	 * 
+	 *
 	 * @param atlasA First atlas to combine.
 	 * @param atlasB Second atlas to combine.
 	 * @return Newly merged ``FlxAtlasFrames`` object.
@@ -495,7 +509,7 @@ class FlxAnimateFrames extends FlxAtlasFrames
 	 * Combines a list of ``FlxAtlasFrames`` into one.
 	 * Recommended to use over manually calling ``frames.addAtlas`` when working with
 	 * ``FlxAnimateFrames`` and other mixed frame types, due to some special merge order conditions it requires.
-	 * 
+	 *
 	 * @param atlasList List of atlas frames to combine.
 	 * @return Newly merged ``FlxAtlasFrames`` object.
 	 */
