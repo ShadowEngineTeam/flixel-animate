@@ -94,6 +94,17 @@ class FlxAnimateFrames extends FlxAtlasFrames
 	 */
 	public var frameRate:Float;
 
+	/**
+	 * The number of times this library instance has been used.
+	 * Determined whether or not this should remain cached.
+	 */
+	public var useCount:Int = 0;
+
+	/**
+	 * If `true` the library instance will remain even if the use count reaches zero.
+	 */
+	public var persist:Bool = false;
+
 	public function new(graphic:FlxGraphic)
 	{
 		super(graphic);
@@ -589,6 +600,19 @@ class FlxAnimateFrames extends FlxAtlasFrames
 
 		checkForSymbol(timeline);
 		checkedDirtySymbols.resize(0);
+	}
+
+	public function incrementUseCount():Void
+	{
+		useCount++;
+	}
+
+	public function decrementUseCount():Void
+	{
+		useCount--;
+
+		if (useCount <= 0 && !persist)
+			destroy();
 	}
 
 	override function destroy():Void
