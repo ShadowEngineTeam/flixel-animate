@@ -71,7 +71,7 @@ class FlxAnimate extends FlxSprite
 	/**
 	 * Whether to apply the stage matrix of the Texture Atlas.
 	 * It also makes the sprite render with the bounds from Animate.
-	 * 
+	 *
 	 * Take note that these bounds may not be accurate to flixel positions.
 	 */
 	public var applyStageMatrix(default, set):Bool = false;
@@ -79,10 +79,10 @@ class FlxAnimate extends FlxSprite
 	/**
 	 * Wether to apply the stage matrix of the Texture Atlas before or after FlxSprite calculations.
 	 * Changes the behaviour of a sprite in relation to the position, scale and rotation of the matrix.
-	 * 
+	 *
 	 * When set to ``false`` the stage matrix will apply before other FlxSprite matrix calculations,
 	 * as if the symbol was contained inside of the sprite.
-	 * 
+	 *
 	 * When set to ``true`` the stage matrix will apply after FlxSprite matrix calculations,
 	 * as if the sprite was contained inside of the symbol.
 	 */
@@ -149,14 +149,20 @@ class FlxAnimate extends FlxSprite
 
 		if (isAnimate)
 		{
+			if (library != null) library.decrementUseCount();
+
 			library = cast frames;
 			timeline = library.timeline;
 			final curApplyStageMatrix:Bool = this.applyStageMatrix;
 			set_applyStageMatrix(curApplyStageMatrix); // Update timeline bounds
 			resetHelpers();
+
+			library.incrementUseCount();
 		}
 		else
 		{
+			if (library != null) library.decrementUseCount();
+
 			library = null;
 			timeline = null;
 		}
@@ -485,12 +491,11 @@ class FlxAnimate extends FlxSprite
 	override function destroy():Void
 	{
 		super.destroy();
+
 		#if !flash
 		_renderTexture = FlxDestroyUtil.destroy(_renderTexture);
 		#end
 		anim = FlxDestroyUtil.destroy(anim);
-		library = null;
-		timeline = null;
 		stageBg = FlxDestroyUtil.destroy(stageBg);
 		skew = FlxDestroyUtil.put(skew);
 	}
