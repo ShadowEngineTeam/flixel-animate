@@ -278,7 +278,7 @@ class FlxAnimate extends FlxSprite
 				_renderTextureDirty = false;
 			}
 
-			camera.drawPixels(_renderTexture.graphic.imageFrame.frame, framePixels, matrix, colorTransform, blend, antialiasing, shader);
+			camera.drawPixels(_renderTexture.graphic.imageFrame.frame, framePixels, matrix, colorTransform, blend, antialiasing, shader, blendTarget);
 		}
 		else
 		#end
@@ -316,7 +316,7 @@ class FlxAnimate extends FlxSprite
 
 		frame.prepareMatrix(matrix, FlxFrameAngle.ANGLE_0, checkFlipX(), checkFlipY());
 		prepareDrawMatrix(matrix, camera);
-		camera.drawPixels(frame, framePixels, matrix, colorTransform, blend, antialiasing, shader);
+		camera.drawPixels(frame, framePixels, matrix, colorTransform, blend, antialiasing, shader, blendTarget);
 	}
 
 	function prepareDrawMatrix(matrix:FlxMatrix, camera:FlxCamera):Void
